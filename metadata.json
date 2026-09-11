@@ -1,0 +1,6 @@
+{
+  "name": "Puja",
+  "description": "Smart, personal AI voice assistant for Android with Hey Puja wake-word, Gemini Live intelligence, Room mood tracking, sassy Hinglish persona, and phone controls.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
