@@ -2,7 +2,7 @@ name: Build Android APK
 
 on:
   push:
-    branches: [ "main", "master" ]
+    branches: [ "main" ]
   workflow_dispatch:
 
 jobs:
@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout Code
+    - name: Checkout code
       uses: actions/checkout@v4
 
     - name: Set up JDK 17
@@ -19,21 +19,24 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
-    - name: Setup Gradle
-      uses: gradle/actions/setup-gradle@v3
+    - name: Find and setup gradlew
+      run: find . -name "gradlew" -exec chmod +x {} + || true
 
-    - name: Generate Gradle Wrapper
-      run: gradle wrapper
-
-    - name: Make Gradlew Executable
-      run: chmod +x gradlew
+    - name: Generate dummy debug keystore
+      run: keytool -genkey -v -keystore debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "C=US, O=Android, CN=Android Debug"
 
     - name: Build Debug APK
-      run: ./gradlew assembleDebug
+      run: |
+        if [ -f "gradlew" ]; then
+          ./gradlew assembleDebug
+        elif [ -d "android" ] && [ -f "android/gradlew" ]; then
+          cd android && ./gradlew assembleDebug
+        else
+          gradle assembleDebug
+        fi
 
-    - name: Upload APK
+    - name: Upload all APKs
       uses: actions/upload-artifact@v4
       with:
-        name: Puja-AI-APK
-        path: app/build/outputs/apk/debug/app-debug.apk
-        
+        name: my-android-app
+        path: '**/*.apk'
